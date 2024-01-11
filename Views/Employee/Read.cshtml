@@ -1,0 +1,117 @@
+﻿@{
+    ViewBag.Title = "Read";
+}
+
+<h2 class="text-center">Get Employee Details</h2>
+
+<div id="title">
+    <h4>@Html.ActionLink("Create New Employee", "Create")</h4>
+</div>
+
+<div class="col-md-3">
+</div>
+<div class="col-md-8">
+    <div id="grid" class="table">
+        <table class="table table-bordered">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Actions</th> <!-- New column for buttons -->
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var employee in ViewData["Employees"] as List<EmployeeModel>)
+                {
+                    <tr id="@employee.Id" class="editable-row">
+                        <td>
+                            <span class="display-mode">@employee.Name</span>
+                            <input type="text" class="edit-mode" value="@employee.Name" />
+                        </td>
+                        <td>
+                            <span class="display-mode">@employee.Age</span>
+                            <input type="text" class="edit-mode" value="@employee.Age" />
+                        </td>
+                        <td>
+                            <button class="edit-button">Edit</button>
+                            <button class="save-button">Save</button>
+                            <button class="delete-button">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Hide all edit-mode inputs initially
+            $(".edit-mode").hide();
+
+            // Handle Edit button click
+            $(".edit-button").on("click", function () {
+                var row = $(this).closest("tr");
+                row.find(".display-mode").hide();
+                row.find(".edit-mode").show();
+            });
+
+            // Handle Save button click
+            $(".save-button").on("click", function () {
+                var row = $(this).closest("tr");
+                var employeeId = row.attr("id");
+                var employeeName = row.find(".edit-mode[name='Name']").val();
+                var employeeAge = row.find(".edit-mode[name='Age']").val();
+
+                // Update your data and save logic here
+                $.ajax({
+                    url: '/Employee/Update',
+                    type: 'POST',
+                    data: {
+                        Id: employeeId,
+                        Name: employeeName,
+                        Age: employeeAge
+                    },
+                    success: function (data) {
+                        // Handle success response
+                        console.log(data);
+                    },
+                    error: function (error) {
+                        // Handle error response
+                        console.error(error);
+                    }
+                });
+
+                row.find(".display-mode").each(function () {
+                    $(this).text(row.find(".edit-mode").val());
+                });
+                row.find(".display-mode").show();
+                row.find(".edit-mode").hide();
+            });
+
+            // Handle Delete button click
+            $(".delete-button").on("click", function () {
+                var row = $(this).closest("tr");
+                var employeeId = row.attr("id");
+
+                // Implement your delete logic here
+                $.ajax({
+                    url: '/Employee/Delete',
+                    type: 'POST',
+                    data: { Id: employeeId },
+                    success: function (data) {
+                        // Handle success response
+                        console.log(data);
+                        row.remove();
+                    },
+                    error: function (error) {
+                        // Handle error response
+                        console.error(error);
+                    }
+                });
+            });
+        });
+    </script>
+}
+
