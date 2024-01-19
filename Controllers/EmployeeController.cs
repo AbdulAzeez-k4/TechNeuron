@@ -102,8 +102,7 @@ namespace MVCCRUD.Controllers
 
 				if (employeeToUpdate != null)
 				{
-					// Update the employee properties
-					employeeToUpdate.Name = empModel.Name;
+
 					employeeToUpdate.Age = empModel.Age;
 
 					// Save changes to the database
